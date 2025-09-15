@@ -1,0 +1,3 @@
+﻿file_name,question,true_label,predicted_label,prediction_text,correct
+1_differential_diagnosis.json,患者女性，31岁，农民，已婚，主诉上腹部不适1周，无明显诱因，伴体重下降约3kg。否认恶心、呕吐、反酸、烧心、腹泻等伴随症状。体格检查示上腹部可触及约8×6cm质硬肿块，边界尚清，无压痛。既往有两次剖...,GIST,GIST,<answer>胃肠道间质瘤（GIST）</answer>,True
+1.json,患者女性，31岁，农民，已婚，主诉上腹部不适1周，体重下降约3kg，无明显恶心呕吐、反酸烧心。体格检查发现上腹部可触及约8×6cm质硬包块，边界尚清，无压痛。既往有两次剖宫产史（2010年、2013年...,GIST,GIST,<answer>胃间质瘤</answer>,True
