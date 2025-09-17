@@ -2,7 +2,6 @@ import openai
 
 BASE_URL = "https://openrouter.ai/api/v1"
 API_KEY = "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"
-
 class ClaudeModel:
     def __init__(self, model_name: str = "anthropic/claude-sonnet-4",api_key: str = API_KEY):
         self.model_name = model_name

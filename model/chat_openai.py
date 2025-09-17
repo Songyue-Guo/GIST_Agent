@@ -4,7 +4,7 @@ try:
     from openai import OpenAI
 except ImportError:
     raise ImportError("If you'd like to use OpenAI models, please install the openai package by running `pip install openai`, and add 'OPENAI_API_KEY' to your environment variables.")
-
+    
 import os
 import json
 import base64

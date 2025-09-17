@@ -4,7 +4,9 @@ import sys
 sys.path.insert(0, '/hpc2hdd/home/sguo349/gsy/hebei4/')
 from agent.base_agent import BaseAgent
 from model.qwen import ChatQwen
-from test_cases import case_early_operable, case_neoadjuvant, case_advanced_unresectable, case_adjuvant, case_recurrent
+from test_cases import case_early_operable, case_real_early_simple, case_neoadjuvant, case_advanced_unresectable, case_adjuvant, case_recurrent
+#from test_cases_real import case_early_simple, case_real_neoadjuvant, case_real_advanced_unresectable, case_real_adjuvant, case_real_recurrent
+
 class SurgeryDecisionAgent(BaseAgent):
     """手术决策评估Agent - 判断患者是否符合手术条件"""
     
@@ -47,6 +49,39 @@ class SurgeryDecisionAgent(BaseAgent):
 {formatted_patient_info}
 
 【相关医学知识】
+🩺 间质瘤（GIST）手术判断要点
+
+一、适合手术的情况
+	1.	局限性肿瘤，可完整切除（R0）
+	•	直径 > 2 cm 的 GIST（胃、小肠、十二指肠、直肠）。
+	•	非胃来源的小 GIST（≤2 cm，因风险较高）。
+	•	胃小 GIST（≤2 cm）但伴随 高危影像学特征或症状（出血、疼痛、梗阻等）。
+	2.	急诊情况
+	•	穿孔、破裂、出血、梗阻。
+	3.	复发/转移但有机会切除的病灶
+	•	靶向治疗后病灶缩小、稳定或部分缓解。
+	•	靶向治疗中仅少数病灶进展，可考虑减瘤手术。
+
+二、不适合直接手术的情况
+	1.	肿瘤因素
+	•	胃小 GIST ≤ 2 cm，无症状、无高危特征（可随访）。
+	•	微小 GIST（≤1 cm），多数惰性，推荐观察。
+	•	局部进展期/边界可切除 GIST：
+	•	需要大范围切除或多脏器联合切除，建议先行新辅助靶向治疗。
+	•	巨大肿瘤（>8 cm）或伴破裂/出血风险高的 → 先靶向治疗再手术。
+	2.	患者因素
+	•	心功能不全：LVEF < 50%、不稳定心绞痛、近期心梗、严重心律失常、失代偿性心衰。
+	•	肺功能差：FEV1 < 50% 预计值，PaO₂ < 60 mmHg 或 PaCO₂ > 50 mmHg，运动耐力 < 4 METs。
+	•	ASA 分级 ≥ IV（高危手术风险）。
+	•	合并严重基础疾病，无法耐受麻醉或手术。
+	•	高龄、拒绝手术者。
+
+三、简要结论
+	•	肿瘤可切除 + 患者心肺功能良好 → 手术
+	•	肿瘤小/低危 → 观察随访
+	•	肿瘤巨大或切除风险高 → 新辅助治疗后再手术
+    •	肿瘤发生转移 → 晚期治疗转化后再手术
+	•	患者全身情况差 → 不适合手术，选择随访或药物治疗
 {knowledge}
 
 请你仔细分析以下几个方面:
@@ -116,4 +151,4 @@ class SurgeryDecisionAgent(BaseAgent):
 
 if __name__ == "__main__":
     agent = SurgeryDecisionAgent(ChatQwen())
-    print(agent.make_decision(case_early_operable))
+    print(agent.make_decision(case_real_early_simple))
