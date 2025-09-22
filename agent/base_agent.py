@@ -3,6 +3,7 @@ import json
 from abc import ABC, abstractmethod
 from typing import Dict, Any, List, Optional, Union
 from agent.tool.rag_tool import RAGTool
+import time
 
 class BaseAgent(ABC):
     """Agent基类，提供通用功能"""
@@ -76,14 +77,24 @@ class BaseAgent(ABC):
         Returns:
             决策结果字典
         """
+        start_time = time.time()
         # 1. 生成提示词
         prompt = self.generate_prompt(patient_info)
         
         # 2. 调用模型
-        response = self.model.generate(prompt)
-        print(response)
+        # 检查是否有response_format属性，如果有则传入
+        if hasattr(self, 'response_format') and self.response_format:
+            if self.response_format == "json":
+                response = self.model.generate(prompt, response_format={"type": "json_object"})
+            else:
+                response = self.model.generate(prompt, response_format=self.response_format)
+        else:
+            response = self.model.generate(prompt)
+            
+        #print(response)
         
         # 3. 处理模型响应
         result = self.process_response(response)
-        
+        end_time = time.time()
+        print(f"Agent执行时间: {end_time - start_time:.2f}秒")
         return result

@@ -4,11 +4,16 @@ import sys
 sys.path.insert(0, '/hpc2hdd/home/sguo349/gsy/hebei4/')
 from agent.base_agent import BaseAgent
 from model.qwen import ChatQwen
-from test_cases import case_early_operable
-
+from test_cases import case_early_operable, case_real_early_simple
+from model.openrouter import ClaudeModel, Qwen3_30b_Model
 
 class SurgeryTypeAgent(BaseAgent):
     """手术方式选择Agent - 根据患者情况推荐合适的手术方式并评分"""
+    
+    def __init__(self, model, response_format="json"):
+        super().__init__(model)
+        self.model = model
+        self.response_format = response_format
     
     def generate_prompt(self, patient_info: Dict[str, Any]) -> str:
         """
@@ -25,13 +30,13 @@ class SurgeryTypeAgent(BaseAgent):
         Returns:
             生成的提示词字符串
         """
-        # 检索相关知识
+        # 检索相关知识 TODO 根据病人信息检索相似病例和对应手术方式
         retrieval_question = "胃间质瘤手术方式类型及选择标准"
-        knowledge = self.retrieve_knowledge(retrieval_question, {
-            "dev_Guidelines_for_GIST": 8,
-            "dev_Cases_in_GIST": 6
-        })
-        
+        # knowledge = self.retrieve_knowledge(retrieval_question, {
+        #     "dev_Guidelines_for_GIST": 8,
+        #     "dev_Cases_in_GIST": 6
+        # })
+        knowledge = ""
         # 格式化患者信息
         formatted_patient_info = "\n".join([
             f"【基本信息】\n{patient_info.get('basic_info', '无')}",
@@ -155,5 +160,12 @@ class SurgeryTypeAgent(BaseAgent):
                 'key_considerations': []
             }
 if __name__ == "__main__":
-    agent = SurgeryTypeAgent(ChatQwen())
-    print(agent.make_decision(case_early_operable))
+    
+    agent_with_json = SurgeryTypeAgent(Qwen3_30b_Model(), "json")
+    print("使用JSON格式响应：")
+    print(agent_with_json.make_decision(case_real_early_simple))
+    
+    # 不使用response_format参数
+    agent_without_format = SurgeryTypeAgent(Qwen3_30b_Model())
+    print("\n不使用response_format参数：")
+    print(agent_without_format.make_decision(case_real_early_simple))

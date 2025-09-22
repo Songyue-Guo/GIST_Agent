@@ -1,3 +1,8 @@
+import requests
+import json
+from typing import Dict, Any, List
+
+
 class RAGTool:
     """知识检索工具类，用于从知识库中检索相关信息"""
     

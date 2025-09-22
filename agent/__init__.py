@@ -1,4 +1,4 @@
-from .base_agent import BaseAgent, RAGTool
+from .base_agent import BaseAgent
 from .surgery_decision import SurgeryDecisionAgent
 from .surgery_type import SurgeryTypeAgent
 from .treatment import TreatmentAgent

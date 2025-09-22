@@ -4,10 +4,16 @@ import sys
 sys.path.insert(0, '/hpc2hdd/home/sguo349/gsy/hebei4/')
 from agent.base_agent import BaseAgent
 from model.qwen import ChatQwen
-from test_cases import case_early_operable, case_neoadjuvant, case_advanced_unresectable, case_adjuvant, case_recurrent
+from test_cases import case_early_operable, case_real_early_simple,case_neoadjuvant, case_advanced_unresectable, case_adjuvant, case_recurrent
+from model.openrouter import ClaudeModel, Qwen3_30b_Model
 
 class TreatmentAgent(BaseAgent):
     """治疗方案Agent - 推荐胃间质瘤的药物治疗方案"""
+    
+    def __init__(self, model, response_format="json"):
+        super().__init__(model)
+        self.model = model
+        self.response_format = response_format
     
     def generate_prompt(self, patient_info: Dict[str, Any]) -> str:
         """
@@ -26,13 +32,13 @@ class TreatmentAgent(BaseAgent):
         Returns:
             生成的提示词字符串
         """
-        # 检索相关知识
+        # 检索相关知识 TODO 根据病人信息检索相似病例和对应用药方案
         retrieval_question = "胃间质瘤药物治疗方案和用药指导"
-        knowledge = self.retrieve_knowledge(retrieval_question, {
-            "dev_Guidelines_for_GIST": 10,
-            "dev_Cases_in_GIST": 4
-        })
-        
+        # knowledge = self.retrieve_knowledge(retrieval_question, {
+        #     "dev_Guidelines_for_GIST": 10,
+        #     "dev_Cases_in_GIST": 4
+        # })
+        knowledge = ""
         # 格式化患者信息
         formatted_patient_info = "\n".join([
             f"【基本信息】\n{patient_info.get('basic_info', '无')}",
@@ -154,5 +160,12 @@ class TreatmentAgent(BaseAgent):
             }
 
 if __name__ == "__main__":
-    agent = TreatmentAgent(ChatQwen())
-    print(agent.make_decision(case_neoadjuvant))
+    
+    agent_with_json = TreatmentAgent(Qwen3_30b_Model(), "json")
+    print("使用JSON格式响应：")
+    print(agent_with_json.make_decision(case_real_early_simple))
+    
+    # 不使用response_format参数
+    agent_without_format = TreatmentAgent(Qwen3_30b_Model())
+    print("\n不使用response_format参数：")
+    print(agent_without_format.make_decision(case_real_early_simple))

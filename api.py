@@ -8,6 +8,7 @@ import asyncio
 from concurrent.futures import ThreadPoolExecutor
 
 from model.qwen import ChatQwen
+from model.openrouter import ClaudeModel, Qwen3_30b_Model
 from agent.surgery_decision import SurgeryDecisionAgent
 from agent.surgery_type import SurgeryTypeAgent
 from agent.treatment import TreatmentAgent
@@ -31,7 +32,7 @@ app.add_middleware(
 )
 
 # 初始化模型和agents
-model = ChatQwen()
+model = Qwen3_30b_Model()
 surgery_decision_agent = SurgeryDecisionAgent(model)
 surgery_type_agent = SurgeryTypeAgent(model)
 treatment_agent = TreatmentAgent(model)
@@ -71,7 +72,7 @@ def run_agent(agent, patient_info):
     return agent.make_decision(patient_info.dict())
 
 # API路由
-@app.post("/api/surgery_decision", response_model=DecisionResponse)
+@app.post("/api/gist_surgery_decision", response_model=DecisionResponse)
 async def get_surgery_decision(patient_info: PatientInfo):
     """
     评估患者是否适合进行胃间质瘤手术
@@ -86,7 +87,7 @@ async def get_surgery_decision(patient_info: PatientInfo):
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"处理请求时发生错误: {str(e)}")
 
-@app.post("/api/surgery_type", response_model=SurgeryTypeResponse)
+@app.post("/api/gist_surgery_type", response_model=SurgeryTypeResponse)
 async def get_surgery_type(patient_info: PatientInfo):
     """
     为适合手术的胃间质瘤患者推荐手术方式
@@ -101,7 +102,7 @@ async def get_surgery_type(patient_info: PatientInfo):
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"处理请求时发生错误: {str(e)}")
 
-@app.post("/api/treatment", response_model=TreatmentResponse)
+@app.post("/api/gist_treatment", response_model=TreatmentResponse)
 async def get_treatment(patient_info: PatientInfo):
     """
     为胃间质瘤患者推荐药物治疗方案
@@ -116,7 +117,7 @@ async def get_treatment(patient_info: PatientInfo):
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"处理请求时发生错误: {str(e)}")
 
-@app.post("/api/comprehensive_decision")
+@app.post("/api/gist_comprehensive_decision")
 async def get_comprehensive_decision(patient_info: PatientInfo):
     """
     提供全面的决策支持，包括手术决策、手术方式选择和药物治疗方案
@@ -155,7 +156,7 @@ if __name__ == "__main__":
 
     def parse_arguments():
         parser = argparse.ArgumentParser(description="启动胃间质瘤决策辅助系统API服务")
-        parser.add_argument("--port", type=int, default=18000, help="API服务端口，默认为8000")
+        parser.add_argument("--port", type=int, default=9999, help="API服务端口，默认为9999,映射到26993")
         return parser.parse_args()
 
     args = parse_arguments()

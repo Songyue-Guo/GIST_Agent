@@ -4,11 +4,16 @@ import sys
 sys.path.insert(0, '/hpc2hdd/home/sguo349/gsy/hebei4/')
 from agent.base_agent import BaseAgent
 from model.qwen import ChatQwen
+from model.openrouter import ClaudeModel, Qwen3_30b_Model
 from test_cases import case_early_operable, case_real_early_simple, case_neoadjuvant, case_advanced_unresectable, case_adjuvant, case_recurrent
 #from test_cases_real import case_early_simple, case_real_neoadjuvant, case_real_advanced_unresectable, case_real_adjuvant, case_real_recurrent
 
 class SurgeryDecisionAgent(BaseAgent):
     """手术决策评估Agent - 判断患者是否符合手术条件"""
+    def __init__(self, model, response_format="json"):
+        super().__init__(model)
+        self.model = model
+        self.response_format = response_format
     
     def generate_prompt(self, patient_info: Dict[str, Any]) -> str:
         """
@@ -24,13 +29,13 @@ class SurgeryDecisionAgent(BaseAgent):
         Returns:
             生成的提示词字符串
         """
-        # 检索相关知识
+        # 检索相关知识 TODO 根据病人信息检索相似病例和对应手术方式
         retrieval_question = "胃间质瘤手术适应症和禁忌症"
-        knowledge = self.retrieve_knowledge(retrieval_question, {
-            "dev_Guidelines_for_GIST": 8,
-            "dev_Cases_in_GIST": 4
-        })
-        
+        # knowledge = self.retrieve_knowledge(retrieval_question, {
+        #     "dev_Guidelines_for_GIST": 8,
+        #     "dev_Cases_in_GIST": 4
+        # })
+        knowledge = ""
         # 格式化患者信息
         formatted_patient_info = "\n".join([
             f"【基本信息】\n{patient_info.get('basic_info', '无')}",
@@ -98,6 +103,8 @@ class SurgeryDecisionAgent(BaseAgent):
   "risk_factors": ["风险因素1", "风险因素2"...], // 识别出的主要风险因素
   "alternative_recommendations": "如不推荐手术，建议的替代治疗方案"
 }}
+## Note
+your response must can be parsed by json.loads!!!
 
 请注意，你的决策必须是负责任的医疗建议，需要考虑患者的整体利益和循证医学证据。
 """
@@ -150,5 +157,12 @@ class SurgeryDecisionAgent(BaseAgent):
             }
 
 if __name__ == "__main__":
-    agent = SurgeryDecisionAgent(ChatQwen())
-    print(agent.make_decision(case_real_early_simple))
+    # 使用JSON格式的响应（会添加response_format参数）
+    agent_with_json = SurgeryDecisionAgent(Qwen3_30b_Model(), "json")
+    print("使用JSON格式响应：")
+    print(agent_with_json.make_decision(case_real_early_simple))
+    
+    # 不使用response_format参数
+    agent_without_format = SurgeryDecisionAgent(Qwen3_30b_Model())
+    print("\n不使用response_format参数：")
+    print(agent_without_format.make_decision(case_real_early_simple))
